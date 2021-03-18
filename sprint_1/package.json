@@ -1,0 +1,24 @@
+{
+  "name": "node-js_2021-q2_ru_gm_sprint_1",
+  "version": "0.0.0",
+  "description": "NodeJS_2021Q2_RU_GM_Sprint_1",
+  "author": {
+    "name": ""
+  },
+  "scripts": {
+    "task1": "nodemon ./task_1/index.js",
+    "task2": "nodemon ./task_2/index.js",
+    "task3": "nodemon --exec babel-node --presets @babel/preset-env -- ./task_3/index.js"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.13.10",
+    "@babel/core": "^7.13.10",
+    "@babel/node": "^7.13.10",
+    "@babel/preset-env": "^7.13.10",
+    "@types/node": "^14.14.35",
+    "nodemon": "^2.0.7"
+  },
+  "dependencies": {
+    "csvtojson": "^2.0.10"
+  }
+}
