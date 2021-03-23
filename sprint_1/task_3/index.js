@@ -26,7 +26,6 @@ eventCreator.start(ENCODING, DATA_EVENT_TYPE);
 const notifierService = new NotifierService(process.stdout, eventBus, NEW_LINE_SYMBOL);
 notifierService.start();
 
-
 const pipelineManager = new PipelineManager();
 const strategy = new Strategy(eventBus);
 strategy.registerRule(REVERSE_COMMAND, new ReverseStringRule());

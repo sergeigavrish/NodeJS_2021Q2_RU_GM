@@ -1,4 +1,4 @@
-const { OnDataReceivedEvent, OnDataBakedEvent, OnErrorEvent } = require('./events');
+const { OnDataReceivedEvent, OnDataBakedEvent } = require('./events');
 
 class RawDataProcessor {
     /**
