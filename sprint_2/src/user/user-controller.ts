@@ -1,83 +1,69 @@
-import express, { NextFunction, Request, Response } from 'express';
-import { NullReferenceException } from '../shared/errors/null-reference-exception';
+import { NextFunction, Response } from 'express';
+import { IValidatedReqBody, IValidatedReqParams, IValidatedReqQuery } from '../shared/interfaces/ivalidated-request';
 import { IUserDto } from './interfaces/iuser-dto';
-import { userService } from './user-service';
+import { IUserId } from './interfaces/iuser-id';
+import { IUserQuery } from './interfaces/iuser-query';
+import { UserService, userService } from './user-service';
 
-enum UserRoutes {
-    userById = '/:userId',
-    userByLogin = '',
-    createdUser = '/',
-    updateUser = '/',
-    deleteUser = '/:userId',
+export class UserController {
+    private static instance: UserController;
+
+    private constructor(
+        private userService: UserService
+    ) { }
+
+    static getInstance(userService: UserService): UserController {
+        if (!UserController.instance) {
+            UserController.instance = new UserController(userService);
+        }
+        return UserController.instance;
+    }
+
+    async getUserById(req: IValidatedReqParams<IUserId>, res: Response, next: NextFunction) {
+        try {
+            const userId = req.params.userId;
+            res.send(await this.userService.getUserById(userId));
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async getUsersByLogin(req: IValidatedReqQuery<IUserQuery>, res: Response, next: NextFunction) {
+        try {
+            const login = req.query.login;
+            const limit = req.query.limit;
+            res.send(await this.userService.getUsersByLogin(login, limit));
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async createUser(req: IValidatedReqBody<IUserDto>, res: Response, next: NextFunction) {
+        try {
+            const userDto = req.body;
+            res.send(await this.userService.createUser(userDto));
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async updateUser(req: IValidatedReqBody<Required<IUserDto>>, res: Response, next: NextFunction) {
+        try {
+            const userDto = req.body;
+            res.send(await this.userService.updateUser(userDto));
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async deleteUser(req: IValidatedReqParams<IUserId>, res: Response, next: NextFunction) {
+        try {
+            const userId = req.params.userId;
+            res.send(await this.userService.deleteUser(userId));
+        } catch (error) {
+            next(error);
+        }
+    }
 }
 
-export const userRouter = express.Router();
-
-userRouter.get(
-    UserRoutes.userById,
-    async (req, res, next) => {
-        try {
-            const userId: string = <string>req.params.userId;
-            res.send(await userService.getUserById(userId));
-        } catch (error) {
-            next(error);
-        }
-    }
-);
-
-userRouter.get(
-    UserRoutes.userByLogin,
-    async (req, res, next) => {
-        try {
-            const login = <string>req.query.login;
-            const limit = Number(req.query.limit);
-            res.send(await userService.getUsersByLogin(login, limit));
-        } catch (error) {
-            next(error);
-        }
-    }
-);
-
-userRouter.post(
-    UserRoutes.createdUser,
-    async (req, res, next) => {
-        try {
-            const userDto: IUserDto = req.body;
-            res.send(await userService.createUser(userDto));
-        } catch (error) {
-            next(error);
-        }
-    }
-);
-
-userRouter.put(
-    UserRoutes.updateUser,
-    async (req, res, next) => {
-        try {
-            const userDto: Required<IUserDto> = req.body;
-            res.send(await userService.updateUser(userDto));
-        } catch (error) {
-            next(error);
-        }
-    }
-);
-
-userRouter.delete(
-    UserRoutes.deleteUser,
-    async (req, res, next) => {
-        try {
-            const userId: string = <string>req.params.userId;
-            res.send(await userService.deleteUser(userId));
-        } catch (error) {
-            next(error);
-        }
-    }
-);
-
-userRouter.use((error: Error, _: Request, res: Response, next: NextFunction) => {
-    if (error instanceof NullReferenceException) {
-        res.sendStatus(404);
-        return;
-    }
-    next(error);
-});
+export const userController = UserController.getInstance(userService);
