@@ -1,20 +1,20 @@
-import express, {Request, Response} from 'express';
-import { userRouter } from './user/user-controller';
+import express, {NextFunction, Request, Response} from 'express';
+import { userRouter } from './user/user-router';
 
 (function () {
-  enum AppRoutes {
-    users = '/users'
-  }
-  
   const app = express()
   const port = 3000
 
   app.use(express.json());
 
-  app.use(AppRoutes.users, userRouter);
+  app.use('/users', userRouter);
 
-  app.use((error: Error, _: Request, res: Response) => {
-    console.error(error.message);
+  app.route('*').all((_: Request, res: Response) => {
+    res.sendStatus(501);
+  });
+
+  app.use((err: Error, _: Request, res: Response, __: NextFunction) => {
+    console.error(err.message);
     res.sendStatus(500);
   });
 
