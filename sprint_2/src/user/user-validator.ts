@@ -10,7 +10,7 @@ const userDtoScheme = {
     login: string().min(1).required(),
     password: string().regex(/^(?:[0-9]+[a-z]|[a-z]+[0-9])[a-z0-9]*$/i).required(),
     age: number().min(4).max(130).required()
-}
+};
 
 const createUserDto = object<IUserDto>(userDtoScheme);
 
