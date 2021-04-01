@@ -3,5 +3,4 @@ export interface IUserDto {
     password: string;
     age: number;
     id?: string;
-    isDeleted?: boolean;
 }
