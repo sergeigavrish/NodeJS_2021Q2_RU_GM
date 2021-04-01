@@ -5,7 +5,7 @@ import { IUserRepository } from './repositories/iuser-repository';
 import { userFactory } from './user-factory';
 import { UserMapper } from './user-mapper';
 
-class UserService {
+export class UserService {
     private static instance: UserService;
 
     private constructor(
