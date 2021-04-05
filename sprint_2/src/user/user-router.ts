@@ -1,15 +1,14 @@
 import express, { Request, Response, NextFunction } from 'express';
 import { NullReferenceException } from '../shared/errors/null-reference-exception';
 import { userController } from './user-controller';
-import { createUserValidator, userIdParamValidator, updateUserValidator, userQueryValidator } from './user-validator';
+import { createUserValidator, userIdParamValidator, updateUserValidator } from './user-validator';
 
 export const userRouter = express.Router();
 
 userRouter
     .route('/')
     .get(
-        userQueryValidator,
-        userController.getUsersByLogin.bind(userController)
+        userController.getUsers.bind(userController)
     )
     .post(
         createUserValidator,

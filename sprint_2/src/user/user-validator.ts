@@ -2,7 +2,6 @@ import { createValidator } from 'express-joi-validation';
 import { number, object, string } from 'joi';
 import { IUserDto } from './interfaces/iuser-dto';
 import { IUserId } from './interfaces/iuser-id';
-import { IUserQuery } from './interfaces/iuser-query';
 
 const userValidator = createValidator();
 
@@ -23,12 +22,6 @@ const userIdParam = object<IUserId>({
     userId: string().guid().required()
 });
 
-const userQuery = object<IUserQuery>({
-    login: string().required(),
-    limit: number().required()
-});
-
 export const createUserValidator = userValidator.body(createUserDto);
 export const updateUserValidator = userValidator.body(updateUserDto);
 export const userIdParamValidator = userValidator.params(userIdParam);
-export const userQueryValidator = userValidator.query(userQuery);

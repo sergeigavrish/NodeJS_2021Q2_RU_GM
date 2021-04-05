@@ -1,5 +1,6 @@
 import { NullReferenceException } from '../shared/errors/null-reference-exception';
 import { IUserDto } from './interfaces/iuser-dto';
+import { IUserQuery } from './interfaces/iuser-query';
 import { InMemoryUserRepository } from './repositories/in-memory-user-repository';
 import { IUserRepository } from './repositories/iuser-repository';
 import { userFactory } from './user-factory';
@@ -18,6 +19,23 @@ export class UserService {
             UserService.instance = new UserService(mapper, repository);
         }
         return UserService.instance;
+    }
+
+    getUsers(query: Partial<IUserQuery>): Promise<IUserDto[]> {
+        if (!query.login && !query.limit) {
+            return this.repository
+                .read()
+                .then(userList => userList.map(this.mapper.mapUserToUserDto));
+        }
+        if (!query.login) {
+            query.login = '';
+        }
+        if (!query.limit) {
+            query.limit = Infinity;
+        }
+        return this.repository
+            .readByLogin(query.login, query.limit)
+            .then(userList => userList.map(this.mapper.mapUserToUserDto));
     }
 
     getUserById(userId: string): Promise<IUserDto> {

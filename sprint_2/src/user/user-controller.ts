@@ -1,5 +1,5 @@
 import { NextFunction, Response } from 'express';
-import { IValidatedReqBody, IValidatedReqParams, IValidatedReqQuery } from '../shared/interfaces/ivalidated-request';
+import { IValidatedReqBody, IValidatedReqParams, IValidatedReqQuery } from '../shared/request/ivalidated-request';
 import { IUserDto } from './interfaces/iuser-dto';
 import { IUserId } from './interfaces/iuser-id';
 import { IUserQuery } from './interfaces/iuser-query';
@@ -19,20 +19,18 @@ export class UserController {
         return UserController.instance;
     }
 
-    async getUserById(req: IValidatedReqParams<IUserId>, res: Response, next: NextFunction) {
+    async getUsers(req: IValidatedReqQuery<Partial<IUserQuery>>, res: Response, next: NextFunction) {
         try {
-            const userId = req.params.userId;
-            res.send(await this.userService.getUserById(userId));
+            res.send(await this.userService.getUsers(req.query));
         } catch (error) {
             next(error);
         }
     }
 
-    async getUsersByLogin(req: IValidatedReqQuery<IUserQuery>, res: Response, next: NextFunction) {
+    async getUserById(req: IValidatedReqParams<IUserId>, res: Response, next: NextFunction) {
         try {
-            const login = req.query.login;
-            const limit = req.query.limit;
-            res.send(await this.userService.getUsersByLogin(login, limit));
+            const userId = req.params.userId;
+            res.send(await this.userService.getUserById(userId));
         } catch (error) {
             next(error);
         }

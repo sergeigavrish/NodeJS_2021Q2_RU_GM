@@ -4,6 +4,14 @@ import { IUserRepository } from './iuser-repository';
 export class InMemoryUserRepository implements IUserRepository {
     private readonly userMap = new Map<string, IUser>();
 
+    async read(): Promise<IUser[]> {
+        try {
+            return Array.from(this.userMap.values());
+        } catch (error) {
+            throw error;
+        }
+    }
+
     async readById(id: string): Promise<IUser | null> {
         try {
             return this.userMap.get(id) || null;
