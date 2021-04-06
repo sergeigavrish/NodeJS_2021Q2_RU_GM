@@ -1,9 +1,10 @@
-export interface IResponse<T> {
+import { IValidationError } from '../errors/ierror-message';
+import { IErrorMessage } from '../validation/ivalidation-error';
+
+export interface IResponse<T = null> {
     success: boolean;
     result: T,
     errorList: IResponseError[]
 }
 
-export interface IResponseError {
-    message: string;
-}
+export type IResponseError =  IErrorMessage | IValidationError;
