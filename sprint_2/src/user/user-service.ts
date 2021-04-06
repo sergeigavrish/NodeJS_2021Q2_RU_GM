@@ -1,5 +1,5 @@
 import { NullReferenceException } from '../shared/errors/null-reference-exception';
-import { IUserDto } from './interfaces/iuser-dto';
+import { ICreateUserDto, IResponseUserDto, IUpdateUserDto } from './interfaces/iuser-dto';
 import { IUserQuery } from './interfaces/iuser-query';
 import { InMemoryUserRepository } from './repositories/in-memory-user-repository';
 import { IUserRepository } from './repositories/iuser-repository';
@@ -21,7 +21,7 @@ export class UserService {
         return UserService.instance;
     }
 
-    getUsers(query: Partial<IUserQuery>): Promise<IUserDto[]> {
+    getUsers(query: Partial<IUserQuery>): Promise<IResponseUserDto[]> {
         if (!query.login && !query.limit) {
             return this.repository
                 .read()
@@ -38,7 +38,7 @@ export class UserService {
             .then(userList => userList.map(this.mapper.mapUserToUserDto));
     }
 
-    getUserById(userId: string): Promise<IUserDto> {
+    getUserById(userId: string): Promise<IResponseUserDto> {
         return this.repository
             .readById(userId)
             .then(user => {
@@ -50,27 +50,27 @@ export class UserService {
             .then(this.mapper.mapUserToUserDto);
     }
 
-    getUsersByLogin(login: string, limit: number): Promise<IUserDto[]> {
+    getUsersByLogin(login: string, limit: number): Promise<IResponseUserDto[]> {
         return this.repository
             .readByLogin(login, limit)
             .then(userList => userList.map(this.mapper.mapUserToUserDto));
     }
 
-    createUser(dto: IUserDto): Promise<IUserDto> {
+    createUser(dto: ICreateUserDto): Promise<IResponseUserDto> {
         const user = userFactory(dto);
         return this.repository
             .create(user)
             .then(this.mapper.mapUserToUserDto);
     }
 
-    updateUser(dto: Required<IUserDto>): Promise<IUserDto> {
+    updateUser(dto: IUpdateUserDto): Promise<IResponseUserDto> {
         return this.repository
             .readById(dto.id)
             .then(user => {
                 if (!user || user.isDeleted) {
                     throw new NullReferenceException(dto.id);
                 }
-                return this.mapper.mapUserDtoToUser(dto, user.isDeleted);
+                return this.mapper.mapUserDtoToUser(dto, user);
             })
             .then(user => this.repository.update(user))
             .then(this.mapper.mapUserToUserDto);

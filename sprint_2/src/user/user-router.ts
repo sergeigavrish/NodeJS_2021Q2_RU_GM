@@ -1,5 +1,9 @@
 import express, { Request, Response, NextFunction } from 'express';
 import { NullReferenceException } from '../shared/errors/null-reference-exception';
+import { IResponse } from '../shared/response/iresponse';
+import { failResponseFactory } from '../shared/response/responseFactory';
+import { validationResultGuard } from '../shared/validation/validation-error-guard';
+import { validationErrorMapper } from '../shared/validation/validation-error-mapper';
 import { userController } from './user-controller';
 import { createUserValidator, userIdParamValidator, updateUserValidator } from './user-validator';
 
@@ -30,9 +34,13 @@ userRouter
         userController.deleteUser.bind(userController)
     );
 
-userRouter.use((error: Error, _: Request, res: Response, next: NextFunction) => {
+userRouter.use((error: Error, _: Request, res: Response<IResponse>, next: NextFunction) => {
     if (error instanceof NullReferenceException) {
-        res.sendStatus(404);
+        res.status(404).json(failResponseFactory([{ message: error.message }]));
+        return;
+    }
+    if (validationResultGuard(error) && error.error) {
+        res.status(400).json(failResponseFactory(validationErrorMapper(error.error)));
         return;
     }
     next(error);
