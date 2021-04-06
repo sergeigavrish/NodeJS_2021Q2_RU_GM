@@ -1,4 +1,6 @@
-import express, {NextFunction, Request, Response} from 'express';
+import express, { NextFunction, Request, Response } from 'express';
+import { IResponse } from './shared/response/iresponse';
+import { failResponseFactory } from './shared/response/responseFactory';
 import { userRouter } from './user/user-router';
 
 (function () {
@@ -9,13 +11,12 @@ import { userRouter } from './user/user-router';
 
   app.use('/users', userRouter);
 
-  app.route('*').all((_: Request, res: Response) => {
-    res.sendStatus(501);
+  app.route('*').all((_: Request, res: Response<IResponse>) => {
+    res.status(501).json(failResponseFactory([{ message: 'Not Implemented' }]));
   });
 
-  app.use((err: Error, _: Request, res: Response, __: NextFunction) => {
-    console.error(err.message);
-    res.sendStatus(500);
+  app.use((err: Error, _: Request, res: Response<IResponse>, __: NextFunction) => {
+    res.status(500).json(failResponseFactory([{ message: err.message }]));
   });
 
   app.listen(port, () => {
