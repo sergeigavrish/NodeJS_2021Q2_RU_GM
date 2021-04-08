@@ -32,6 +32,8 @@ export class UserService {
         }
         if (!query.limit) {
             query.limit = Infinity;
+        } else {
+            query.limit = Number(query.limit);
         }
         return this.repository
             .readByLogin(query.login, query.limit)
