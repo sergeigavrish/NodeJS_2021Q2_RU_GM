@@ -52,12 +52,6 @@ export class UserService {
             .then(this.mapper.mapUserToUserDto);
     }
 
-    getUsersByLogin(login: string, limit: number): Promise<IResponseUserDto[]> {
-        return this.repository
-            .readByLogin(login, limit)
-            .then(userList => userList.map(this.mapper.mapUserToUserDto));
-    }
-
     createUser(dto: ICreateUserDto): Promise<IResponseUserDto> {
         const user = userFactory(dto);
         return this.repository
