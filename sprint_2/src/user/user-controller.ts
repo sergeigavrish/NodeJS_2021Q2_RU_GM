@@ -2,7 +2,7 @@ import { NextFunction, Response } from 'express';
 import { IValidatedReqBody, IValidatedReqParams, IValidatedReqQuery } from '../shared/request/ivalidated-request';
 import { IResponse } from '../shared/response/iresponse';
 import { successResponseFactory } from '../shared/response/responseFactory';
-import { ICreateUserDto, IResponseUserDto, IUpdateUserDto } from './interfaces/iuser-dto';
+import { IResponseUserDto, IUserDto } from './interfaces/iuser-dto';
 import { IUserId } from './interfaces/iuser-id';
 import { IUserQuery } from './interfaces/iuser-query';
 import { UserService, userService } from './user-service';
@@ -21,7 +21,7 @@ export class UserController {
         return UserController.instance;
     }
 
-    async getUsers(req: IValidatedReqQuery<Partial<IUserQuery>>, res: Response<IResponse<IResponseUserDto[]>>, next: NextFunction) {
+    async getUsers(req: IValidatedReqQuery<IUserQuery>, res: Response<IResponse<IResponseUserDto[]>>, next: NextFunction) {
         try {
             res.send(successResponseFactory(await this.userService.getUsers(req.query)));
         } catch (error) {
@@ -38,7 +38,7 @@ export class UserController {
         }
     }
 
-    async createUser(req: IValidatedReqBody<ICreateUserDto>, res: Response<IResponse<IResponseUserDto>>, next: NextFunction) {
+    async createUser(req: IValidatedReqBody<IUserDto>, res: Response<IResponse<IResponseUserDto>>, next: NextFunction) {
         try {
             const userDto = req.body;
             res.send(successResponseFactory(await this.userService.createUser(userDto)));
@@ -47,10 +47,11 @@ export class UserController {
         }
     }
 
-    async updateUser(req: IValidatedReqBody<IUpdateUserDto>, res: Response<IResponse<IResponseUserDto>>, next: NextFunction) {
+    async updateUser(req: IValidatedReqBody<IUserDto>, res: Response<IResponse<IResponseUserDto>>, next: NextFunction) {
         try {
+            const userId: string = req.params.userId;
             const userDto = req.body;
-            res.send(successResponseFactory(await this.userService.updateUser(userDto)));
+            res.send(successResponseFactory(await this.userService.updateUser(userId, userDto)));
         } catch (error) {
             next(error);
         }

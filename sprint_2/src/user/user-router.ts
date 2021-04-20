@@ -5,22 +5,19 @@ import { failResponseFactory } from '../shared/response/responseFactory';
 import { validationResultGuard } from '../shared/validation/validation-error-guard';
 import { validationErrorMapper } from '../shared/validation/validation-error-mapper';
 import { userController } from './user-controller';
-import { createUserValidator, userIdParamValidator, updateUserValidator } from './user-validator';
+import { createUserValidator, userIdParamValidator, updateUserValidator, queryUserValidator } from './user-validator';
 
 export const userRouter = express.Router();
 
 userRouter
     .route('/')
     .get(
+        queryUserValidator,
         userController.getUsers.bind(userController)
     )
     .post(
         createUserValidator,
         userController.createUser.bind(userController)
-    )
-    .put(
-        updateUserValidator,
-        userController.updateUser.bind(userController)
     );
 
 userRouter
@@ -28,6 +25,11 @@ userRouter
     .get(
         userIdParamValidator,
         userController.getUserById.bind(userController)
+    )
+    .put(
+        userIdParamValidator,
+        updateUserValidator,
+        userController.updateUser.bind(userController)
     )
     .delete(
         userIdParamValidator,

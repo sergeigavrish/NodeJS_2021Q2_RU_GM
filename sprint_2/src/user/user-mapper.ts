@@ -1,11 +1,11 @@
 import { hashSaltFactory } from '../shared/auth/hashSaltFactory';
 import { IUser } from './interfaces/iuser';
-import { IResponseUserDto, IUpdateUserDto } from './interfaces/iuser-dto';
+import { IResponseUserDto, IUserDto } from './interfaces/iuser-dto';
 
 export class UserMapper {
-    mapUserDtoToUser(dto: IUpdateUserDto, user: IUser): IUser {
+    mapUserDtoToUser(dto: IUserDto, user: IUser): IUser {
         return {
-            id: dto.id,
+            id: user.id,
             login: dto.login || user.login,
             password: dto.password ? hashSaltFactory(dto.password) : user.password,
             age: dto.age || user.age,

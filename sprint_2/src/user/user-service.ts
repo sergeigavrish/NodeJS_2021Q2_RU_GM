@@ -1,5 +1,6 @@
 import { NullReferenceException } from '../shared/errors/null-reference-exception';
-import { ICreateUserDto, IResponseUserDto, IUpdateUserDto } from './interfaces/iuser-dto';
+import { IUser } from './interfaces/iuser';
+import { IResponseUserDto, IUserDto } from './interfaces/iuser-dto';
 import { IUserQuery } from './interfaces/iuser-query';
 import { InMemoryUserRepository } from './repositories/in-memory-user-repository';
 import { IUserRepository } from './repositories/iuser-repository';
@@ -21,20 +22,7 @@ export class UserService {
         return UserService.instance;
     }
 
-    getUsers(query: Partial<IUserQuery>): Promise<IResponseUserDto[]> {
-        if (!query.login && !query.limit) {
-            return this.repository
-                .read()
-                .then(userList => userList.map(this.mapper.mapUserToUserDto));
-        }
-        if (!query.login) {
-            query.login = '';
-        }
-        if (!query.limit) {
-            query.limit = Infinity;
-        } else {
-            query.limit = Number(query.limit);
-        }
+    getUsers(query: IUserQuery): Promise<IResponseUserDto[]> {
         return this.repository
             .readByLogin(query.login, query.limit)
             .then(userList => userList.map(this.mapper.mapUserToUserDto));
@@ -43,31 +31,22 @@ export class UserService {
     getUserById(userId: string): Promise<IResponseUserDto> {
         return this.repository
             .readById(userId)
-            .then(user => {
-                if (!user || user.isDeleted) {
-                    throw new NullReferenceException(userId);
-                }
-                return user;
-            })
+            .then(user => this.checkUser(userId, user))
             .then(this.mapper.mapUserToUserDto);
     }
 
-    createUser(dto: ICreateUserDto): Promise<IResponseUserDto> {
+    createUser(dto: IUserDto): Promise<IResponseUserDto> {
         const user = userFactory(dto);
         return this.repository
             .create(user)
             .then(this.mapper.mapUserToUserDto);
     }
 
-    updateUser(dto: IUpdateUserDto): Promise<IResponseUserDto> {
+    updateUser(userId: string, dto: IUserDto): Promise<IResponseUserDto> {
         return this.repository
-            .readById(dto.id)
-            .then(user => {
-                if (!user || user.isDeleted) {
-                    throw new NullReferenceException(dto.id);
-                }
-                return this.mapper.mapUserDtoToUser(dto, user);
-            })
+            .readById(userId)
+            .then(user => this.checkUser(userId, user))
+            .then(user => this.mapper.mapUserDtoToUser(dto, user))
             .then(user => this.repository.update(user))
             .then(this.mapper.mapUserToUserDto);
     }
@@ -75,12 +54,15 @@ export class UserService {
     deleteUser(userId: string): Promise<boolean> {
         return this.repository
             .readById(userId)
-            .then(user => {
-                if (!user || user.isDeleted) {
-                    throw new NullReferenceException(userId);
-                }
-                return this.repository.delete(userId);
-            });
+            .then(user => this.checkUser(userId, user))
+            .then(_ => this.repository.delete(userId));
+    }
+
+    private checkUser(userId: string, user: IUser | null) {
+        if (!user || user.isDeleted) {
+            throw new NullReferenceException(userId);
+        }
+        return user;
     }
 }
 

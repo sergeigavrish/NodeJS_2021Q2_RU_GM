@@ -4,12 +4,8 @@ export interface IResponseUserDto {
     age: number;
 }
 
-export interface ICreateUserDto {
+export interface IUserDto {
     login: string;
     age: number;
     password: string;
-}
-
-export interface IUpdateUserDto extends Partial<ICreateUserDto> {
-    id: string;
 }
