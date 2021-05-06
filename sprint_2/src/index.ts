@@ -1,4 +1,5 @@
 import express, { NextFunction, Request, Response } from 'express';
+import { dbContext } from './db/db-context';
 import { IResponse } from './shared/response/iresponse';
 import { failResponseFactory } from './shared/response/responseFactory';
 import { userRouter } from './user/user-router';
@@ -8,6 +9,8 @@ import { userRouter } from './user/user-router';
   const port = 3000
 
   app.use(express.json());
+
+  await dbContext.sequelize.sync();
 
   app.use('/users', userRouter);
 
