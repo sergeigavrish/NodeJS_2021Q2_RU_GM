@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon --config nodemon.json src/index.ts",
-    "migrate": "sequelize db:migrate"
+    "init-db": "npm run migrate & npm run seed",
+    "migrate": "sequelize db:migrate",
+    "seed": "sequelize db:seed:all"
   },
   "keywords": [],
   "author": "",
