@@ -24,7 +24,7 @@ const userIdParam = object<IUserId>({
 
 const getUserQuery = object<IUserQuery>({
     login: string().optional().default(""),
-    limit: number().optional().min(1).default(Infinity)
+    limit: number().optional().min(1)
 });
 
 export const queryUserValidator = userValidator.query(getUserQuery);

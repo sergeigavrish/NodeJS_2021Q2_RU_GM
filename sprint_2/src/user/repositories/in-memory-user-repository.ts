@@ -1,12 +1,28 @@
 import { IUser } from '../interfaces/iuser';
-import { IUserRepository } from './iuser-repository';
+import { IUserQuery } from '../interfaces/iuser-query';
+import { IRepository } from '../../shared/repositories/irepository';
 
-export class InMemoryUserRepository implements IUserRepository {
+export class InMemoryUserRepository implements IRepository<IUser, Partial<IUserQuery>> {
     private readonly userMap = new Map<string, IUser>();
 
-    async read(): Promise<IUser[]> {
+    async read(options: Partial<IUserQuery> = {login: ''}): Promise<IUser[]> {
         try {
-            return Array.from(this.userMap.values());
+            if (!options.limit) {
+                options.limit = Infinity;
+            }
+            const iterator: IterableIterator<IUser> = this.userMap.values();
+            const result: IUser[] = [];
+            let user: IUser;
+            while ((user = iterator.next().value) && result.length < options.limit) {
+                if (!user.isDeleted) {
+                    if (options.login && user.login.toLocaleLowerCase().includes(options.login.toLocaleLowerCase())) {
+                        result.push(user);
+                        continue;
+                    }
+                    result.push(user);
+                }
+            }
+            return result;
         } catch (error) {
             throw error;
         }
@@ -15,22 +31,6 @@ export class InMemoryUserRepository implements IUserRepository {
     async readById(id: string): Promise<IUser | null> {
         try {
             return this.userMap.get(id) || null;
-        } catch (error) {
-            throw error;
-        }
-    }
-
-    async readByLogin(login: string, limit: number): Promise<IUser[]> {
-        try {
-            const iterator: IterableIterator<IUser> = this.userMap.values();
-            const result: IUser[] = [];
-            let user: IUser;
-            while ((user = iterator.next().value) && result.length < limit) {
-                if (!user.isDeleted && user.login.toLocaleLowerCase().includes(login.toLocaleLowerCase())) {
-                    result.push(user);
-                }
-            }
-            return result;
         } catch (error) {
             throw error;
         }

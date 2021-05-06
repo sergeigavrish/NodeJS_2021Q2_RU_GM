@@ -1,6 +1,7 @@
 import { hashSaltFactory } from '../shared/auth/hashSaltFactory';
 import { IUser } from './interfaces/iuser';
-import { IResponseUserDto, IUserDto } from './interfaces/iuser-dto';
+import { IUserDto } from './interfaces/iuser-dto';
+import { IResponseUserDto } from './interfaces/iresponse-user-dto';
 
 export class UserMapper {
     mapUserDtoToUser(dto: IUserDto, user: IUser): IUser {

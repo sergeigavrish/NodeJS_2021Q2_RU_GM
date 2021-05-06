@@ -3,7 +3,7 @@ import { IResponse } from './shared/response/iresponse';
 import { failResponseFactory } from './shared/response/responseFactory';
 import { userRouter } from './user/user-router';
 
-(function () {
+(async function () {
   const app = express()
   const port = 3000
 
