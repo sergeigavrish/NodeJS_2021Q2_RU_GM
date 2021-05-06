@@ -1,4 +1,4 @@
-import { Association, DataTypes, HasManyAddAssociationMixin, HasManyCountAssociationsMixin, HasManyCreateAssociationMixin, HasManyGetAssociationsMixin, HasManyHasAssociationMixin, HasManySetAssociationsMixin, Model, Sequelize } from 'sequelize';
+import { Association, DataTypes, HasManySetAssociationsMixin, Model, Sequelize } from 'sequelize';
 import { User } from '../../user/models/user';
 import { IGroup } from '../interfaces/igroup';
 import { PermissionTypes } from '../types/permission-types';
