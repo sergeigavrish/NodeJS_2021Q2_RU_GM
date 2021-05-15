@@ -5,7 +5,6 @@ import { IGroupRepository } from './igroup-repository';
 
 export class PgGroupRepository implements IGroupRepository {
     async updateUserGroup(groupId: string, listUserId: string[]): Promise<IGroup> {
-        // return 
         try {
             return await Group.findByPk(groupId).then(group => {
                 if (!group) {
