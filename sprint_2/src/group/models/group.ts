@@ -3,6 +3,10 @@ import { User } from '../../user/models/user';
 import { IGroup } from '../interfaces/igroup';
 import { PermissionTypes } from '../types/permission-types';
 
+type IPermissionsKey = keyof Pick<IGroup, 'permissions'>;
+const PERMISSIONS: IPermissionsKey = 'permissions';
+const SEPARATOR = ',';
+
 export class Group extends Model implements IGroup {
   id!: string;
   name!: string;
@@ -10,7 +14,7 @@ export class Group extends Model implements IGroup {
   public setUsers!: HasManySetAssociationsMixin<User, string>;
   public readonly users?: User[];
   public static associations: {
-    projects: Association<Group, User>;
+    users: Association<Group, User>;
   };
 };
 
@@ -29,10 +33,10 @@ export function groupModelInitialization(sequelize: Sequelize): typeof Group {
       type: DataTypes.STRING,
       allowNull: false,
       get() {
-        return this.getDataValue('permissions').split(',')
+        return this.getDataValue<IPermissionsKey>(PERMISSIONS).split(SEPARATOR)
       },
       set(val: Array<PermissionTypes>) {
-        this.setDataValue('permissions', val.join(','));
+        this.setDataValue<IPermissionsKey>(PERMISSIONS, val.join(SEPARATOR));
       },
     }
   }, {

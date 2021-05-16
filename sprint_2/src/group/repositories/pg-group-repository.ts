@@ -1,23 +1,9 @@
 import { NullReferenceException } from '../../shared/errors/null-reference-exception';
+import { IRepository } from '../../shared/repositories/irepository';
 import { IGroup } from '../interfaces/igroup';
 import { Group } from '../models/group';
-import { IGroupRepository } from './igroup-repository';
 
-export class PgGroupRepository implements IGroupRepository {
-    async updateUserGroup(groupId: string, listUserId: string[]): Promise<IGroup> {
-        try {
-            return await Group.findByPk(groupId).then(group => {
-                if (!group) {
-                    throw new NullReferenceException(groupId);
-                }
-                group.setUsers(listUserId);
-                return group;
-            });
-        } catch (error) {
-            throw error;
-        }
-    }
-
+export class PgGroupRepository implements IRepository<IGroup> {
     async read(): Promise<IGroup[]> {
         try {
             return await Group.findAll();

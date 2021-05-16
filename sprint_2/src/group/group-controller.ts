@@ -23,7 +23,9 @@ export class GroupController {
 
     async get(_: Request, res: Response<IResponse<IResponseGroupDto[]>>, next: NextFunction) {
         try {
-            res.send(successResponseFactory(await this.service.get()));
+            const groups = await this.service.get();
+            const response = successResponseFactory(groups);
+            res.json(response);
         } catch (error) {
             next(error);
         }
@@ -32,7 +34,9 @@ export class GroupController {
     async getById(req: IValidatedReqParams<IGroupId>, res: Response<IResponse<IResponseGroupDto>>, next: NextFunction) {
         try {
             const groupId = req.params.groupId;
-            res.json(successResponseFactory(await this.service.getById(groupId)));
+            const group = await this.service.getById(groupId);
+            const response = successResponseFactory(group);
+            res.json(response);
         } catch (error) {
             next(error);
         }
@@ -41,7 +45,9 @@ export class GroupController {
     async create(req: IValidatedReqBody<IGroupDto>, res: Response<IResponse<IResponseGroupDto>>, next: NextFunction) {
         try {
             const groupDto = req.body;
-            res.send(successResponseFactory(await this.service.create(groupDto)));
+            const group = await this.service.create(groupDto);
+            const response = successResponseFactory(group);
+            res.json(response);
         } catch (error) {
             next(error);
         }
@@ -51,7 +57,9 @@ export class GroupController {
         try {
             const groupId: string = req.params.groupId;
             const groupDto = req.body;
-            res.send(successResponseFactory(await this.service.update(groupId, groupDto)));
+            const group = await this.service.update(groupId, groupDto);
+            const response = successResponseFactory(group);
+            res.json(response);
         } catch (error) {
             next(error);
         }
@@ -60,16 +68,9 @@ export class GroupController {
     async delete(req: IValidatedReqParams<IGroupId>, res: Response<IResponse<boolean>>, next: NextFunction) {
         try {
             const groupId: string = req.params.groupId;
-            res.send(successResponseFactory(await this.service.delete(groupId)));
-        } catch (error) {
-            next(error);
-        }
-    }
-
-    async addToGroup(req: IValidatedReqBody<Array<string>>, res: Response<IResponse<IResponseGroupDto>>, next: NextFunction) {
-        try {
-            const groupId: string = req.params.groupId;
-            res.send(successResponseFactory(await this.service.addToGroup(groupId, req.body)));
+            const isDeleted = await this.service.delete(groupId);
+            const response = successResponseFactory(isDeleted);
+            res.json(response);
         } catch (error) {
             next(error);
         }

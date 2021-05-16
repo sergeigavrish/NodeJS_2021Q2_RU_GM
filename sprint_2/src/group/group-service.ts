@@ -5,17 +5,17 @@ import { IGroup } from './interfaces/igroup';
 import { IResponseGroupDto } from './interfaces/iresponse-group-dto';
 import { IGroupDto } from './interfaces/igroup-dto';
 import { PgGroupRepository } from './repositories/pg-group-repository';
-import { IGroupRepository } from './repositories/igroup-repository';
+import { IRepository } from '../shared/repositories/irepository';
 
 export class GroupService {
     private static instance: GroupService;
 
     private constructor(
         private mapper: GroupMapper,
-        private repository: IGroupRepository
+        private repository: IRepository<IGroup>
     ) { }
 
-    static getInstance(mapper: GroupMapper, repository: IGroupRepository): GroupService {
+    static getInstance(mapper: GroupMapper, repository: IRepository<IGroup>): GroupService {
         if (!GroupService.instance) {
             GroupService.instance = new GroupService(mapper, repository);
         }
@@ -31,38 +31,31 @@ export class GroupService {
     getById(id: string): Promise<IResponseGroupDto> {
         return this.repository
             .readById(id)
-            .then(user => this.checkItem(id, user))
+            .then(group => this.checkItem(id, group))
             .then(this.mapper.mapGroupToResponseGroupDto);
     }
 
     create(dto: IGroupDto): Promise<IResponseGroupDto> {
-        const user = groupFactory(dto);
+        const group = groupFactory(dto);
         return this.repository
-            .create(user)
+            .create(group)
             .then(this.mapper.mapGroupToResponseGroupDto);
     }
 
-    update(userId: string, dto: Partial<IGroupDto>): Promise<IResponseGroupDto> {
+    update(groupId: string, dto: Partial<IGroupDto>): Promise<IResponseGroupDto> {
         return this.repository
-            .readById(userId)
-            .then(user => this.checkItem(userId, user))
-            .then(user => this.mapper.mapGroupDtoToGroup(dto, user))
-            .then(user => this.repository.update(user))
+            .readById(groupId)
+            .then(group => this.checkItem(groupId, group))
+            .then(group => this.mapper.mapGroupDtoToGroup(dto, group))
+            .then(group => this.repository.update(group))
             .then(this.mapper.mapGroupToResponseGroupDto);
     }
 
-    delete(userId: string): Promise<boolean> {
+    delete(groupId: string): Promise<boolean> {
         return this.repository
-            .readById(userId)
-            .then(user => this.checkItem(userId, user))
-            .then(_ => this.repository.delete(userId));
-    }
-
-    addToGroup(groupId: string, userIdList: Array<string>): Promise<IResponseGroupDto> {
-        console.log(userIdList);
-        return this.repository
-            .updateUserGroup(groupId, userIdList)
-            .then(this.mapper.mapGroupToResponseGroupDto);
+            .readById(groupId)
+            .then(group => this.checkItem(groupId, group))
+            .then(_ => this.repository.delete(groupId));
     }
 
     private checkItem(id: string, item: IGroup | null) {

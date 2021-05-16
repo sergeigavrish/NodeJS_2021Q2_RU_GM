@@ -21,9 +21,6 @@ const groupIdParam = object<IGroupId>({
     groupId: string().guid().required()
 });
 
-const addToGroup = array().items(string().guid());
-
 export const createGroupValidator = groupValidator.body(createGroupDto);
 export const updateGroupValidator = groupValidator.body(updateGroupDto);
 export const groupIdParamValidator = groupValidator.params(groupIdParam);
-export const addToGroupValidator = groupValidator.body(addToGroup);
