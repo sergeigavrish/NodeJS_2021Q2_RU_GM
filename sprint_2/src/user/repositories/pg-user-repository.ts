@@ -3,9 +3,9 @@ import { NullReferenceException } from '../../shared/errors/null-reference-excep
 import { IUser } from '../interfaces/iuser';
 import { IUserQuery } from '../interfaces/iuser-query';
 import { User } from '../models/user';
-import { IRepository } from '../../shared/repositories/irepository';
+import { IUserRepository } from './iuser-repository';
 
-export class PgUserRepository implements IRepository<IUser, Partial<IUserQuery>> {
+export class PgUserRepository implements IUserRepository<IUser, Partial<IUserQuery>> {
     async read(options?: Partial<IUserQuery>): Promise<IUser[]> {
         try {
             const findOptions: FindOptions<IUser> = { where: { isDeleted: false } };
@@ -61,6 +61,19 @@ export class PgUserRepository implements IRepository<IUser, Partial<IUserQuery>>
                     }
                     throw new NullReferenceException(id);
                 });
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async addUserToGroups(userId: string, groupIdList: string[]): Promise<boolean> {
+        try {
+            const user = await User.findByPk(userId)
+            if (!user) {
+                throw new NullReferenceException(userId);
+            }
+            await user.setGroups(groupIdList);
+            return true;
         } catch (error) {
             throw error;
         }

@@ -1,5 +1,5 @@
 'use strict';
-import { Association, DataTypes, Model, Sequelize } from 'sequelize';
+import { Association, DataTypes, HasManySetAssociationsMixin, Model, Sequelize } from 'sequelize';
 import { Group } from '../../group/models/group';
 import { IUser } from '../interfaces/iuser';
 
@@ -9,7 +9,8 @@ export class User extends Model<IUser> implements IUser {
   password!: string;
   age!: number;
   isDeleted!: boolean;
-  readonly groups?: Group[];
+  public setGroups!: HasManySetAssociationsMixin<User, string>;
+  public readonly groups?: Group[];
   static associations: {
     projects: Association<User, Group>;
   };

@@ -1,5 +1,5 @@
 import { createValidator } from 'express-joi-validation';
-import { number, object, string } from 'joi';
+import { array, number, object, string } from 'joi';
 import { IUserDto } from './interfaces/iuser-dto';
 import { IUserId } from './interfaces/iuser-id';
 import { IUserQuery } from './interfaces/iuser-query';
@@ -27,7 +27,12 @@ const getUserQuery = object<IUserQuery>({
     limit: number().optional().min(1)
 });
 
+const addToGroup = object({
+    groupIdList: array().items(string().guid())
+});
+
 export const queryUserValidator = userValidator.query(getUserQuery);
 export const createUserValidator = userValidator.body(createUserDto);
 export const updateUserValidator = userValidator.body(updateUserDto);
 export const userIdParamValidator = userValidator.params(userIdParam);
+export const addToGroupsValidator = userValidator.body(addToGroup);

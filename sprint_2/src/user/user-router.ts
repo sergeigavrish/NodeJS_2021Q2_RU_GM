@@ -5,7 +5,7 @@ import { failResponseFactory } from '../shared/response/responseFactory';
 import { validationResultGuard } from '../shared/validation/validation-error-guard';
 import { validationErrorMapper } from '../shared/validation/validation-error-mapper';
 import { userController } from './user-controller';
-import { createUserValidator, userIdParamValidator, updateUserValidator, queryUserValidator } from './user-validator';
+import { createUserValidator, userIdParamValidator, updateUserValidator, queryUserValidator, addToGroupsValidator } from './user-validator';
 
 export const userRouter = express.Router();
 
@@ -34,6 +34,14 @@ userRouter
     .delete(
         userIdParamValidator,
         userController.deleteUser.bind(userController)
+    );
+
+userRouter
+    .route('/:userId/groups')
+    .put(
+        userIdParamValidator,
+        addToGroupsValidator,
+        userController.addUserToGroups.bind(userController)
     );
 
 userRouter.use((error: Error, _: Request, res: Response<IResponse>, next: NextFunction) => {
