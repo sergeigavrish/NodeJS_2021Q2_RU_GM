@@ -10,22 +10,26 @@ module.exports = {
       },
       user_id: {
         type: Sequelize.UUID,
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
         references: {
           model: 'Users',
-          key: 'id',
-          onUpdate: 'CASCADE',
-          onDelete: 'CASCADE'
+          key: 'id'
         }
       },
       group_id: {
         type: Sequelize.UUID,
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
         references: {
           model: 'Groups',
-          key: 'id',
-          onUpdate: 'CASCADE',
-          onDelete: 'CASCADE'
+          key: 'id'
         }
       }
+    })
+    await queryInterface.addConstraint('UserGroup', {
+      fields: ['user_id', 'group_id'],
+      type: 'unique'
     });
   },
   down: async (queryInterface, Sequelize) => {
