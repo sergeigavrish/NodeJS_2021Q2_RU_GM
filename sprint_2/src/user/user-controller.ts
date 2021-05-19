@@ -26,9 +26,9 @@ export class UserController {
         try {
             const users = await this.service.getUsers(req.query);
             const response = successResponseFactory(users);
-            res.json(response);
+            return res.json(response);
         } catch (error) {
-            next(error);
+            return next(error);
         }
     }
 
@@ -37,9 +37,9 @@ export class UserController {
             const userId = req.params.userId;
             const user = await this.service.getUserById(userId);
             const response = successResponseFactory(user);
-            res.json(response);
+            return res.json(response);
         } catch (error) {
-            next(error);
+            return next(error);
         }
     }
 
@@ -48,9 +48,9 @@ export class UserController {
             const userDto = req.body;
             const user = await this.service.createUser(userDto);
             const response = successResponseFactory(user);
-            res.json(response);
+            return res.json(response);
         } catch (error) {
-            next(error);
+            return next(error);
         }
     }
 
@@ -60,9 +60,9 @@ export class UserController {
             const userDto = req.body;
             const user = await this.service.updateUser(userId, userDto);
             const response = successResponseFactory(user);
-            res.json(response);
+            return res.json(response);
         } catch (error) {
-            next(error);
+            return next(error);
         }
     }
 
@@ -71,9 +71,9 @@ export class UserController {
             const userId = req.params.userId;
             const isDeleted = await this.service.deleteUser(userId);
             const response = successResponseFactory(isDeleted);
-            res.json(response);
+            return res.json(response);
         } catch (error) {
-            next(error);
+            return next(error);
         }
     }
 
@@ -83,9 +83,9 @@ export class UserController {
             const groupIdList = req.body.groupIdList;
             const result = await this.service.addUserToGroups(userId, groupIdList);
             const response = successResponseFactory(result);
-            res.json(response);
+            return res.json(response);
         } catch (error) {
-            next(error);
+            return next(error);
         }
     }
 }

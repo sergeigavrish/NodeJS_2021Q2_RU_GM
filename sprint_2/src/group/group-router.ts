@@ -37,12 +37,10 @@ groupRouter
 
 groupRouter.use((error: Error, _: Request, res: Response<IResponse>, next: NextFunction) => {
     if (error instanceof NullReferenceException) {
-        res.status(404).json(failResponseFactory([{ message: error.message }]));
-        return;
+        return res.status(404).json(failResponseFactory([{ message: error.message }]));
     }
     if (validationResultGuard(error) && error.error) {
-        res.status(400).json(failResponseFactory(validationErrorMapper(error.error)));
-        return;
+        return res.status(400).json(failResponseFactory(validationErrorMapper(error.error)));
     }
-    next(error);
+    return next(error);
 });

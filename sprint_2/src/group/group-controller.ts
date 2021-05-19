@@ -25,9 +25,9 @@ export class GroupController {
         try {
             const groups = await this.service.get();
             const response = successResponseFactory(groups);
-            res.json(response);
+            return res.json(response);
         } catch (error) {
-            next(error);
+            return next(error);
         }
     }
 
@@ -36,9 +36,9 @@ export class GroupController {
             const groupId = req.params.groupId;
             const group = await this.service.getById(groupId);
             const response = successResponseFactory(group);
-            res.json(response);
+            return res.json(response);
         } catch (error) {
-            next(error);
+            return next(error);
         }
     }
 
@@ -47,9 +47,9 @@ export class GroupController {
             const groupDto = req.body;
             const group = await this.service.create(groupDto);
             const response = successResponseFactory(group);
-            res.json(response);
+            return res.json(response);
         } catch (error) {
-            next(error);
+            return next(error);
         }
     }
 
@@ -59,9 +59,9 @@ export class GroupController {
             const groupDto = req.body;
             const group = await this.service.update(groupId, groupDto);
             const response = successResponseFactory(group);
-            res.json(response);
+            return res.json(response);
         } catch (error) {
-            next(error);
+            return next(error);
         }
     }
 
@@ -70,9 +70,9 @@ export class GroupController {
             const groupId: string = req.params.groupId;
             const isDeleted = await this.service.delete(groupId);
             const response = successResponseFactory(isDeleted);
-            res.json(response);
+            return res.json(response);
         } catch (error) {
-            next(error);
+            return next(error);
         }
     }
 }
