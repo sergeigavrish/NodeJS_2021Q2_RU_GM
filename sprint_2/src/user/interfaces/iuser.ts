@@ -1,9 +1,7 @@
-import { IHashSalt } from '../../shared/auth/ihash-salt';
-
 export interface IUser {
     id: string;
     login: string;
-    password: IHashSalt;
+    password: string;
     age: number;
     isDeleted: boolean;
 }

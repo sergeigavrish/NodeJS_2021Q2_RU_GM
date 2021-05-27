@@ -1,21 +1,22 @@
 import { NullReferenceException } from '../shared/errors/null-reference-exception';
 import { IUser } from './interfaces/iuser';
-import { IResponseUserDto, IUserDto } from './interfaces/iuser-dto';
+import { IUserDto } from './interfaces/iuser-dto';
 import { IUserQuery } from './interfaces/iuser-query';
-import { InMemoryUserRepository } from './repositories/in-memory-user-repository';
-import { IUserRepository } from './repositories/iuser-repository';
+import { PgUserRepository } from './repositories/pg-user-repository';
+import { IRepository } from '../shared/repositories/irepository';
 import { userFactory } from './user-factory';
 import { UserMapper } from './user-mapper';
+import { IResponseUserDto } from './interfaces/iresponse-user-dto';
 
 export class UserService {
     private static instance: UserService;
 
     private constructor(
         private mapper: UserMapper,
-        private repository: IUserRepository
+        private repository: IRepository<IUser, Partial<IUserQuery>>
     ) { }
 
-    static getInstance(mapper: UserMapper, repository: IUserRepository): UserService {
+    static getInstance(mapper: UserMapper, repository: IRepository<IUser, Partial<IUserQuery>>): UserService {
         if (!UserService.instance) {
             UserService.instance = new UserService(mapper, repository);
         }
@@ -23,8 +24,9 @@ export class UserService {
     }
 
     getUsers(query: IUserQuery): Promise<IResponseUserDto[]> {
+        const { login, limit } = query;
         return this.repository
-            .readByLogin(query.login, query.limit)
+            .read({ login, limit })
             .then(userList => userList.map(this.mapper.mapUserToUserDto));
     }
 
@@ -68,5 +70,5 @@ export class UserService {
 
 export const userService = UserService.getInstance(
     new UserMapper(),
-    new InMemoryUserRepository()
+    new PgUserRepository()
 );
