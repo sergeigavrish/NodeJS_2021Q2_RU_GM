@@ -1,5 +1,6 @@
 import express, { NextFunction, Request, Response } from 'express';
 import { dbContext } from './db/db-context';
+import { groupRouter } from './group/group-router';
 import { IResponse } from './shared/response/iresponse';
 import { failResponseFactory } from './shared/response/responseFactory';
 import { userRouter } from './user/user-router';
@@ -13,6 +14,7 @@ import { userRouter } from './user/user-router';
   await dbContext.sequelize.sync();
 
   app.use('/users', userRouter);
+  app.use('/groups', groupRouter);
 
   app.route('*').all((_: Request, res: Response<IResponse>) => {
     res.status(501).json(failResponseFactory([{ message: 'Not Implemented' }]));

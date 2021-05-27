@@ -5,7 +5,7 @@ import { failResponseFactory } from '../shared/response/responseFactory';
 import { validationResultGuard } from '../shared/validation/validation-error-guard';
 import { validationErrorMapper } from '../shared/validation/validation-error-mapper';
 import { userController } from './user-controller';
-import { createUserValidator, userIdParamValidator, updateUserValidator, queryUserValidator } from './user-validator';
+import { createUserValidator, userIdParamValidator, updateUserValidator, queryUserValidator, addToGroupsValidator } from './user-validator';
 
 export const userRouter = express.Router();
 
@@ -36,14 +36,20 @@ userRouter
         userController.deleteUser.bind(userController)
     );
 
+userRouter
+    .route('/:userId/groups')
+    .put(
+        userIdParamValidator,
+        addToGroupsValidator,
+        userController.addUserToGroups.bind(userController)
+    );
+
 userRouter.use((error: Error, _: Request, res: Response<IResponse>, next: NextFunction) => {
     if (error instanceof NullReferenceException) {
-        res.status(404).json(failResponseFactory([{ message: error.message }]));
-        return;
+        return res.status(404).json(failResponseFactory([{ message: error.message }]));
     }
     if (validationResultGuard(error) && error.error) {
-        res.status(400).json(failResponseFactory(validationErrorMapper(error.error)));
-        return;
+        return res.status(400).json(failResponseFactory(validationErrorMapper(error.error)));
     }
-    next(error);
+    return next(error);
 });

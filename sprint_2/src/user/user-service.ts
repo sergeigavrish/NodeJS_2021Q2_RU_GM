@@ -3,20 +3,20 @@ import { IUser } from './interfaces/iuser';
 import { IUserDto } from './interfaces/iuser-dto';
 import { IUserQuery } from './interfaces/iuser-query';
 import { PgUserRepository } from './repositories/pg-user-repository';
-import { IRepository } from '../shared/repositories/irepository';
 import { userFactory } from './user-factory';
 import { UserMapper } from './user-mapper';
 import { IResponseUserDto } from './interfaces/iresponse-user-dto';
+import { IUserRepository } from './repositories/iuser-repository';
 
 export class UserService {
     private static instance: UserService;
 
     private constructor(
         private mapper: UserMapper,
-        private repository: IRepository<IUser, Partial<IUserQuery>>
+        private repository: IUserRepository<IUser, Partial<IUserQuery>>
     ) { }
 
-    static getInstance(mapper: UserMapper, repository: IRepository<IUser, Partial<IUserQuery>>): UserService {
+    static getInstance(mapper: UserMapper, repository: IUserRepository<IUser, Partial<IUserQuery>>): UserService {
         if (!UserService.instance) {
             UserService.instance = new UserService(mapper, repository);
         }
@@ -58,6 +58,10 @@ export class UserService {
             .readById(userId)
             .then(user => this.checkUser(userId, user))
             .then(_ => this.repository.delete(userId));
+    }
+
+    addUserToGroups(userId: string, groupIdList: Array<string>): Promise<boolean> {
+        return this.repository.addUserToGroups(userId, groupIdList);
     }
 
     private checkUser(userId: string, user: IUser | null) {

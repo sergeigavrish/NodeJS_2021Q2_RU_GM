@@ -4,10 +4,13 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start:db": "docker-compose up -d",
     "start": "nodemon --config nodemon.json src/index.ts",
     "init-db": "npm run migrate & npm run seed",
-    "migrate": "sequelize db:migrate",
-    "seed": "sequelize db:seed:all"
+    "migrate:up": "sequelize db:migrate",
+    "migrate:down": "sequelize db:migrate:undo:all",
+    "seed:up": "sequelize db:seed:all",
+    "seed:down": "sequelize db:seed:undo:all"
   },
   "keywords": [],
   "author": "",
