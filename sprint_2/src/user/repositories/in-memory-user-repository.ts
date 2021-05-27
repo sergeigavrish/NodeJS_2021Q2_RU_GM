@@ -1,6 +1,10 @@
 import { IUser } from '../interfaces/iuser';
 import { IUserQuery } from '../interfaces/iuser-query';
 import { IRepository } from '../../shared/repositories/irepository';
+import { logger } from '../../logger/bootstrap-logger';
+import { CustomException } from '../../shared/errors/custom-exception';
+import { MethodException } from '../../shared/errors/method-exception';
+import { removeKeysFromObject } from '../../utils/remove-fields';
 
 export class InMemoryUserRepository implements IRepository<IUser, Partial<IUserQuery>> {
     private readonly userMap = new Map<string, IUser>();
@@ -24,6 +28,7 @@ export class InMemoryUserRepository implements IRepository<IUser, Partial<IUserQ
             }
             return result;
         } catch (error) {
+            error = this.handleError(error, this.read.name, options);
             throw error;
         }
     }
@@ -32,6 +37,7 @@ export class InMemoryUserRepository implements IRepository<IUser, Partial<IUserQ
         try {
             return this.userMap.get(id) || null;
         } catch (error) {
+            error = this.handleError(error, this.readById.name, id);
             throw error;
         }
     }
@@ -41,6 +47,7 @@ export class InMemoryUserRepository implements IRepository<IUser, Partial<IUserQ
             this.userMap.set(user.id, user);
             return user;
         } catch (error) {
+            error = this.handleError(error, this.create.name, removeKeysFromObject(user, 'password'));
             throw error;
         }
     }
@@ -50,6 +57,7 @@ export class InMemoryUserRepository implements IRepository<IUser, Partial<IUserQ
             this.userMap.set(user.id, user);
             return user;
         } catch (error) {
+            error = this.handleError(error, this.update.name, removeKeysFromObject(user, 'password'));
             throw error;
         }
     }
@@ -63,7 +71,16 @@ export class InMemoryUserRepository implements IRepository<IUser, Partial<IUserQ
             user.isDeleted = true;
             return true;
         } catch (error) {
+            error = this.handleError(error, this.delete.name, id);
             throw error;
         }
+    }
+
+    private handleError(error: Error | CustomException, method: string, ...params: any[]): Error {
+        if (!(error instanceof CustomException)) {
+            error = new MethodException(error.message, method, params);
+            logger.error({ message: error.message, label: InMemoryUserRepository.name })
+        }
+        return error;
     }
 }

@@ -1,5 +1,9 @@
 import { FindOptions } from 'sequelize';
+import { logger } from '../../logger/bootstrap-logger';
+import { CustomException } from '../../shared/errors/custom-exception';
+import { MethodException } from '../../shared/errors/method-exception';
 import { NullReferenceException } from '../../shared/errors/null-reference-exception';
+import { removeKeysFromObject } from '../../utils/remove-fields';
 import { IUser } from '../interfaces/iuser';
 import { IUserQuery } from '../interfaces/iuser-query';
 import { User } from '../models/user';
@@ -17,6 +21,7 @@ export class PgUserRepository implements IUserRepository<IUser, Partial<IUserQue
             }
             return await User.findAll(findOptions);
         } catch (error) {
+            error = this.handleError(error, this.read.name, options);
             throw error;
         }
     }
@@ -25,6 +30,7 @@ export class PgUserRepository implements IUserRepository<IUser, Partial<IUserQue
         try {
             return await User.findByPk(id);
         } catch (error) {
+            error = this.handleError(error, this.readById.name, id);
             throw error;
         }
     }
@@ -33,6 +39,7 @@ export class PgUserRepository implements IUserRepository<IUser, Partial<IUserQue
         try {
             return await User.create(user)
         } catch (error) {
+            error = this.handleError(error, this.create.name, removeKeysFromObject(user, 'password'));
             throw error;
         }
     }
@@ -48,6 +55,7 @@ export class PgUserRepository implements IUserRepository<IUser, Partial<IUserQue
                     throw new NullReferenceException(user.id);
                 });
         } catch (error) {
+            error = this.handleError(error, this.update.name, removeKeysFromObject(user, 'password'));
             throw error;
         }
     }
@@ -62,6 +70,7 @@ export class PgUserRepository implements IUserRepository<IUser, Partial<IUserQue
                     throw new NullReferenceException(id);
                 });
         } catch (error) {
+            error = this.handleError(error, this.delete.name, id);
             throw error;
         }
     }
@@ -75,7 +84,16 @@ export class PgUserRepository implements IUserRepository<IUser, Partial<IUserQue
             await user.setGroups(groupIdList);
             return true;
         } catch (error) {
+            error = this.handleError(error, this.addUserToGroups.name, userId, groupIdList);
             throw error;
         }
+    }
+
+    private handleError(error: Error | CustomException, method: string, ...params: any[]): Error {
+        if (!(error instanceof CustomException)) {
+            error = new MethodException(error.message, method, params);
+            logger.error({ message: error.message, label: PgUserRepository.name })
+        }
+        return error;
     }
 }

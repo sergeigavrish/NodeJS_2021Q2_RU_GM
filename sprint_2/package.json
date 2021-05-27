@@ -4,9 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start:db": "docker-compose up -d",
+    "start:db": "docker compose up -d",
     "start": "nodemon --config nodemon.json src/index.ts",
-    "init-db": "npm run migrate & npm run seed",
+    "init-db": "npm run migrate:up & npm run seed:up",
     "migrate:up": "sequelize db:migrate",
     "migrate:down": "sequelize db:migrate:undo:all",
     "seed:up": "sequelize db:seed:all",
@@ -33,6 +33,7 @@
     "pg": "^8.6.0",
     "pg-hstore": "^2.3.3",
     "sequelize": "^6.6.2",
-    "uuid": "^8.3.2"
+    "uuid": "^8.3.2",
+    "winston": "^3.3.3"
   }
 }

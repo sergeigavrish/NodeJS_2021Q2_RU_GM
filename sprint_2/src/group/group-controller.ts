@@ -6,6 +6,9 @@ import { IGroupId } from './interfaces/igroup-id';
 import { GroupService, groupService } from './group-service';
 import { IGroupDto } from './interfaces/igroup-dto';
 import { IResponseGroupDto } from './interfaces/iresponse-group-dto';
+import { logger } from '../logger/bootstrap-logger';
+import { CustomException } from '../shared/errors/custom-exception';
+import { MethodException } from '../shared/errors/method-exception';
 
 export class GroupController {
     private static instance: GroupController;
@@ -21,12 +24,13 @@ export class GroupController {
         return GroupController.instance;
     }
 
-    async get(_: Request, res: Response<IResponse<IResponseGroupDto[]>>, next: NextFunction) {
+    async get(req: Request, res: Response<IResponse<IResponseGroupDto[]>>, next: NextFunction) {
         try {
             const groups = await this.service.get();
             const response = successResponseFactory(groups);
             return res.json(response);
         } catch (error) {
+            error = this.handleError(error, this.get.name, req.params, req.query);
             return next(error);
         }
     }
@@ -38,6 +42,7 @@ export class GroupController {
             const response = successResponseFactory(group);
             return res.json(response);
         } catch (error) {
+            error = this.handleError(error, this.getById.name, req.params, req.query);
             return next(error);
         }
     }
@@ -49,6 +54,7 @@ export class GroupController {
             const response = successResponseFactory(group);
             return res.json(response);
         } catch (error) {
+            error = this.handleError(error, this.create.name, req.params, req.query);
             return next(error);
         }
     }
@@ -61,6 +67,7 @@ export class GroupController {
             const response = successResponseFactory(group);
             return res.json(response);
         } catch (error) {
+            error = this.handleError(error, this.update.name, req.params, req.query);
             return next(error);
         }
     }
@@ -72,8 +79,17 @@ export class GroupController {
             const response = successResponseFactory(isDeleted);
             return res.json(response);
         } catch (error) {
+            error = this.handleError(error, this.delete.name, req.params, req.query);
             return next(error);
         }
+    }
+
+    private handleError<T, U>(error: Error | CustomException, method: string, params: T, query: U): Error {
+        if (!(error instanceof CustomException)) {
+            error = new MethodException(error.message, method, params, query);
+            logger.error({ message: error.message, label: GroupController.name })
+        }
+        return error;
     }
 }
 

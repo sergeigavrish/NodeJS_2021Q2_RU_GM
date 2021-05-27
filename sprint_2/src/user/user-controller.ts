@@ -1,4 +1,7 @@
 import { NextFunction, Response } from 'express';
+import { logger } from '../logger/bootstrap-logger';
+import { CustomException } from '../shared/errors/custom-exception';
+import { MethodException } from '../shared/errors/method-exception';
 import { IValidatedReqBody, IValidatedReqParams, IValidatedReqQuery } from '../shared/request/ivalidated-request';
 import { IResponse } from '../shared/response/iresponse';
 import { successResponseFactory } from '../shared/response/responseFactory';
@@ -28,6 +31,7 @@ export class UserController {
             const response = successResponseFactory(users);
             return res.json(response);
         } catch (error) {
+            error = this.handleError(error, this.getUsers.name, req.params, req.query);
             return next(error);
         }
     }
@@ -39,6 +43,7 @@ export class UserController {
             const response = successResponseFactory(user);
             return res.json(response);
         } catch (error) {
+            error = this.handleError(error, this.getUserById.name, req.params, req.query);
             return next(error);
         }
     }
@@ -50,6 +55,7 @@ export class UserController {
             const response = successResponseFactory(user);
             return res.json(response);
         } catch (error) {
+            error = this.handleError(error, this.createUser.name, req.params, req.query);
             return next(error);
         }
     }
@@ -62,6 +68,7 @@ export class UserController {
             const response = successResponseFactory(user);
             return res.json(response);
         } catch (error) {
+            error = this.handleError(error, this.updateUser.name, req.params, req.query);
             return next(error);
         }
     }
@@ -73,6 +80,7 @@ export class UserController {
             const response = successResponseFactory(isDeleted);
             return res.json(response);
         } catch (error) {
+            error = this.handleError(error, this.deleteUser.name, req.params, req.query);
             return next(error);
         }
     }
@@ -85,8 +93,17 @@ export class UserController {
             const response = successResponseFactory(result);
             return res.json(response);
         } catch (error) {
+            error = this.handleError(error, this.addUserToGroups.name, req.params, req.query);
             return next(error);
         }
+    }
+
+    private handleError<T, U>(error: Error | CustomException, method: string, params: T, query: U): Error {
+        if (!(error instanceof CustomException)) {
+            error = new MethodException(error.message, method, params, query);
+            logger.error({ message: error.message, label: UserController.name })
+        }
+        return error;
     }
 }
 
