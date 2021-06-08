@@ -40,7 +40,6 @@ export class UserService {
     getUserById(userId: string): Promise<IResponseUserDto> {
         return this.repository
             .readById(userId)
-            .then(() => { throw new Error("SOME ERROR") })
             .then(user => this.checkUser(userId, user))
             .then(this.mapper.mapUserToUserDto)
             .catch(
