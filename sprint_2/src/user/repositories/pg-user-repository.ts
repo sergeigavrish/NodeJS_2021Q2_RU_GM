@@ -1,4 +1,5 @@
 import { FindOptions } from 'sequelize';
+import { dbContext } from '../../db/db-context';
 import { logger } from '../../logger/bootstrap-logger';
 import { CustomException } from '../../shared/errors/custom-exception';
 import { MethodException } from '../../shared/errors/method-exception';
@@ -36,54 +37,64 @@ export class PgUserRepository implements IUserRepository<IUser, Partial<IUserQue
     }
 
     async create(user: IUser): Promise<IUser> {
+        const transaction = await dbContext.sequelize.transaction();
         try {
-            return await User.create(user)
+            const result = await User.create(user, { transaction });
+            transaction.commit();
+            return result
         } catch (error) {
+            transaction.rollback();
             error = this.handleError(error, this.create.name, removeKeysFromObject(user, 'password'));
             throw error;
         }
     }
 
     async update(user: IUser): Promise<IUser> {
+        const transaction = await dbContext.sequelize.transaction();
         try {
-            return await User
-                .update(user, { where: { id: user.id } })
-                .then(([status, _]: [number, User[]]) => {
-                    if (status === 1) {
-                        return user;
-                    }
-                    throw new NullReferenceException(user.id);
-                });
+            const [status, _]: [number, User[]] = await User.update(user, { where: { id: user.id }, transaction });
+            if (status === 1) {
+                transaction.commit();
+                return user;
+            }
+            throw new NullReferenceException(user.id);
         } catch (error) {
+            transaction.rollback();
             error = this.handleError(error, this.update.name, removeKeysFromObject(user, 'password'));
             throw error;
         }
     }
 
     async delete(id: string): Promise<boolean> {
+        const transaction = await dbContext.sequelize.transaction();
         try {
-            return await User.update({ isDeleted: true }, { where: { id } })
-                .then(([status, _]: [number, User[]]) => {
-                    if (status === 1) {
-                        return true;
-                    }
-                    throw new NullReferenceException(id);
-                });
+            const user = await User.findByPk(id, { transaction });
+            if (!user) {
+                throw new NullReferenceException(id);
+            }
+            await user.update({ isDeleted: true }, { transaction });
+            await user.setGroups([], { transaction });
+            await transaction.commit();
+            return true;
         } catch (error) {
+            await transaction.rollback();
             error = this.handleError(error, this.delete.name, id);
             throw error;
         }
     }
 
     async addUserToGroups(userId: string, groupIdList: string[]): Promise<boolean> {
+        const transaction = await dbContext.sequelize.transaction();
         try {
             const user = await User.findByPk(userId)
             if (!user) {
                 throw new NullReferenceException(userId);
             }
-            await user.setGroups(groupIdList);
+            await user.setGroups(groupIdList, { transaction });
+            transaction.commit();
             return true;
         } catch (error) {
+            transaction.rollback();
             error = this.handleError(error, this.addUserToGroups.name, userId, groupIdList);
             throw error;
         }
