@@ -13,12 +13,13 @@ const config: Options = configHashSet[env];
 
 export interface DbContext {
   sequelize: Sequelize;
-  Sequelize: Sequelize;
+  Sequelize: typeof Sequelize;
   User: User;
   Group: Group;
 }
 
-export const dbContext: { [key: string]: any } = {};
+//@ts-ignore
+export const dbContext: DbContext = {};
 
 let sequelize: Sequelize;
 if (config.hasOwnProperty('use_env_variable')) {
@@ -33,17 +34,13 @@ if (config.hasOwnProperty('use_env_variable')) {
   groupModelInitialization
 ].forEach(modelInit => {
   const model = modelInit(sequelize);
+  //@ts-ignore
   dbContext[model.name] = model;
 });
 
-User.belongsToMany(Group, { through: 'UserGroup', foreignKey: 'user_id', timestamps: false });
-Group.belongsToMany(User, { through: 'UserGroup', foreignKey: 'group_id', timestamps: false });
+User.belongsToMany(Group, { through: 'UserGroup', foreignKey: 'user_id', timestamps: false, hooks: true, onDelete: 'CASCADE', onUpdate: 'CASCADE' });
+Group.belongsToMany(User, { through: 'UserGroup', foreignKey: 'group_id', timestamps: false, onDelete: 'CASCADE', onUpdate: 'CASCADE' });
 
-Object.keys(dbContext).forEach(modelName => {
-  if (dbContext[modelName].associate) {
-    dbContext[modelName].associate(dbContext);
-  }
-});
 
 dbContext.sequelize = sequelize;
 dbContext.Sequelize = Sequelize;
