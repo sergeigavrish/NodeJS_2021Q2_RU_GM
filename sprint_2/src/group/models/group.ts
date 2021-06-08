@@ -1,4 +1,4 @@
-import { Association, DataTypes, HasManySetAssociationsMixin, Model, Sequelize } from 'sequelize';
+import { Association, DataTypes, Model, Sequelize } from 'sequelize';
 import { User } from '../../user/models/user';
 import { IGroup } from '../interfaces/igroup';
 import { PermissionTypes } from '../types/permission-types';
@@ -11,7 +11,6 @@ export class Group extends Model implements IGroup {
   id!: string;
   name!: string;
   permissions!: PermissionTypes[];
-  public setUsers!: HasManySetAssociationsMixin<User, string>;
   public readonly users?: User[];
   public static associations: {
     users: Association<Group, User>;

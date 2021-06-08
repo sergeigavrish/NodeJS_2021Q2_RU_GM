@@ -5,3 +5,5 @@ export interface IUser {
     age: number;
     isDeleted: boolean;
 }
+
+export type Login = Pick<IUser, 'login' | 'password'>;
