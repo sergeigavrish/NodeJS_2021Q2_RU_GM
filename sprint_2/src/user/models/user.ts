@@ -9,7 +9,7 @@ export class User extends Model<IUser> implements IUser {
   password!: string;
   age!: number;
   isDeleted!: boolean;
-  public setGroups!: HasManySetAssociationsMixin<User, string>;
+  public setGroups!: HasManySetAssociationsMixin<Group, string>;
   public readonly groups?: Group[];
   static associations: {
     projects: Association<User, Group>;
