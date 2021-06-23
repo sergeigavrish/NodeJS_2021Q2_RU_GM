@@ -1,0 +1,5 @@
+2021-06-09T23:29:14.279Z error: [APP] app.use() requires a middleware function
+2021-06-09T23:30:45.466Z error: [APP] app.use() requires a middleware function
+2021-06-09T23:34:22.043Z error: [APP] app.use() requires a middleware function
+2021-06-09T23:36:59.760Z error: [APP] app.use() requires a middleware function
+2021-06-09T23:46:08.074Z error: [APP] invalid token

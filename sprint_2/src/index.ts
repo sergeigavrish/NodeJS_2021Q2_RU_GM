@@ -1,4 +1,5 @@
 import express, { NextFunction, Request, Response } from 'express';
+import dotenv from 'dotenv';
 import { dbContext } from './db/db-context';
 import { groupRouter } from './group/group-router';
 import { bootstrapLogger, logger } from './logger/bootstrap-logger';
@@ -6,11 +7,16 @@ import { CustomException } from './shared/errors/custom-exception';
 import { IResponse } from './shared/response/iresponse';
 import { failResponseFactory } from './shared/response/responseFactory';
 import { userRouter } from './user/user-router';
+import { authMiddleware } from './auth/auth-middleware';
+import { authorizationErrorHandler, authenticationErrorHandler } from './auth/auth-error-handlers';
+import { authRouter } from './auth/auth-router';
 
 const LABEL = 'APP';
 
 (async function () {
   bootstrapLogger();
+
+  dotenv.config();
 
   process.on('uncaughtException', (error: Error) => {
     logger.error({ message: error.message, label: LABEL });
@@ -34,8 +40,9 @@ const LABEL = 'APP';
     next();
   });
 
-  app.use('/users', userRouter);
-  app.use('/groups', groupRouter);
+  app.use('/', authRouter);
+  app.use('/users', authMiddleware, userRouter);
+  app.use('/groups', authMiddleware, groupRouter);
 
   app.route('*').all((req: Request, res: Response<IResponse>) => {
     const message = 'Not Implemented';
@@ -44,6 +51,8 @@ const LABEL = 'APP';
     res.status(501).json(response);
   });
 
+  app.use(authenticationErrorHandler);
+  app.use(authorizationErrorHandler);
   app.use((err: Error, _: Request, res: Response<IResponse>, __: NextFunction) => {
     let message: string;
     if (!(err instanceof CustomException)) {
@@ -53,7 +62,7 @@ const LABEL = 'APP';
       message = err.getOriginMessage();
     }
     const response = failResponseFactory([{ message: message }]);
-    res.status(500).json(response);
+    return res.status(500).json(response);
   });
 
   app.listen(port, () => {
