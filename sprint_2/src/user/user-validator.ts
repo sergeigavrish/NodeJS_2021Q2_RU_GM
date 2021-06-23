@@ -23,7 +23,7 @@ const userIdParam = object<IUserId>({
 });
 
 const getUserQuery = object<IUserQuery>({
-    login: string().optional().default(""),
+    login: string().optional().default(''),
     limit: number().optional().min(1)
 });
 

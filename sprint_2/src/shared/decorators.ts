@@ -1,5 +1,5 @@
-import { dbContext } from "../db/db-context";
-import { logger } from "../logger/bootstrap-logger";
+import { dbContext } from '../db/db-context';
+import { logger } from '../logger/bootstrap-logger';
 
 type HandlerFunction = (error: Error, propertyKey: string, ...args: any[]) => any;
 

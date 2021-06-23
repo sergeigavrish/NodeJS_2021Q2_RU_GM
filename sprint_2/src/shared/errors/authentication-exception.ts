@@ -2,8 +2,8 @@
 import { CustomException } from './custom-exception';
 
 export class AuthenticationException extends CustomException {
-    constructor(message: string) {
-        super(message);
+    constructor() {
+        super('Wrong password');
         Object.setPrototypeOf(this, AuthenticationException.prototype);
     }
 }

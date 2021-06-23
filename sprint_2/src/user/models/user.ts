@@ -26,7 +26,13 @@ export function userModelInitialization(sequelize: Sequelize): typeof User {
   }, {
     sequelize,
     modelName: User.name,
-    timestamps: false
+    timestamps: false,
+    indexes: [
+      {
+        unique: true,
+        fields: ['login']
+      }
+    ]
   });
 
   return User;
