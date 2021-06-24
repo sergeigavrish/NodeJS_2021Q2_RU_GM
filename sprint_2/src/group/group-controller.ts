@@ -3,7 +3,7 @@ import { IValidatedReqBody, IValidatedReqParams } from '../shared/request/ivalid
 import { IResponse } from '../shared/response/iresponse';
 import { successResponseFactory } from '../shared/response/responseFactory';
 import { IGroupId } from './interfaces/igroup-id';
-import { GroupService, groupService } from './group-service';
+import { GroupService } from './group-service';
 import { IGroupDto } from './interfaces/igroup-dto';
 import { IResponseGroupDto } from './interfaces/iresponse-group-dto';
 import { logger } from '../logger/bootstrap-logger';
@@ -11,18 +11,9 @@ import { CustomException } from '../shared/errors/custom-exception';
 import { MethodException } from '../shared/errors/method-exception';
 
 export class GroupController {
-    private static instance: GroupController;
-
-    private constructor(
+    constructor(
         private service: GroupService
     ) { }
-
-    static getInstance(service: GroupService): GroupController {
-        if (!GroupController.instance) {
-            GroupController.instance = new GroupController(service);
-        }
-        return GroupController.instance;
-    }
 
     async get(req: Request, res: Response<IResponse<IResponseGroupDto[]>>, next: NextFunction) {
         try {
@@ -92,5 +83,3 @@ export class GroupController {
         return error;
     }
 }
-
-export const groupController = GroupController.getInstance(groupService);
