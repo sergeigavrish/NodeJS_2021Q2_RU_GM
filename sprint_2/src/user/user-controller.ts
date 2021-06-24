@@ -9,21 +9,13 @@ import { IResponseUserDto } from './interfaces/iresponse-user-dto';
 import { IUserDto } from './interfaces/iuser-dto';
 import { IUserId } from './interfaces/iuser-id';
 import { IUserQuery } from './interfaces/iuser-query';
-import { UserService, userService } from './user-service';
+import { UserService } from './user-service';
 
 export class UserController {
-    private static instance: UserController;
 
-    private constructor(
+    constructor(
         private service: UserService
     ) { }
-
-    static getInstance(userService: UserService): UserController {
-        if (!UserController.instance) {
-            UserController.instance = new UserController(userService);
-        }
-        return UserController.instance;
-    }
 
     async getUsers(req: IValidatedReqQuery<IUserQuery>, res: Response<IResponse<IResponseUserDto[]>>, next: NextFunction) {
         try {
@@ -106,5 +98,3 @@ export class UserController {
         return error;
     }
 }
-
-export const userController = UserController.getInstance(userService);

@@ -2,7 +2,6 @@ import { NullReferenceException } from '../shared/errors/null-reference-exceptio
 import { IUser } from './interfaces/iuser';
 import { IUserDto } from './interfaces/iuser-dto';
 import { IUserQuery } from './interfaces/iuser-query';
-import { PgUserRepository } from './repositories/pg-user-repository';
 import { userFactory } from './user-factory';
 import { UserMapper } from './user-mapper';
 import { IResponseUserDto } from './interfaces/iresponse-user-dto';
@@ -13,19 +12,10 @@ import { removeKeysFromObject } from '../utils/remove-fields';
 import { logger } from '../logger/bootstrap-logger';
 
 export class UserService {
-    private static instance: UserService;
-
-    private constructor(
+    constructor(
         private mapper: UserMapper,
         private repository: IUserRepository<IUser, Partial<IUserQuery>>
     ) { }
-
-    static getInstance(mapper: UserMapper, repository: IUserRepository<IUser, Partial<IUserQuery>>): UserService {
-        if (!UserService.instance) {
-            UserService.instance = new UserService(mapper, repository);
-        }
-        return UserService.instance;
-    }
 
     getUsers(query: IUserQuery): Promise<IResponseUserDto[]> {
         const { login, limit } = query;
@@ -111,8 +101,3 @@ export class UserService {
         }
     }
 }
-
-export const userService = UserService.getInstance(
-    new UserMapper(),
-    new PgUserRepository()
-);
