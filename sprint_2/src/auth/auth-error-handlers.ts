@@ -17,7 +17,7 @@ export const authenticationErrorHandler = (err: Error, _: Request, res: Response
     return next(err);
 }
 
-export const authorizationErrorHandler = (err: Error, _: Request, res: Response<IResponse>, next: NextFunction): any => {
+export const authorizationErrorHandler = (err: Error, _: Request, res: Response<IResponse>, next: NextFunction) => {
     if (err instanceof AuthorizationException || err instanceof JsonWebTokenError) {
         logger.error({ message: err.message, label: LABEL });
         const response = failResponseFactory([{ message: err.message }]);
