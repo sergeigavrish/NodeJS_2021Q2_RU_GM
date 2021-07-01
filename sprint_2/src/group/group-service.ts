@@ -4,26 +4,16 @@ import { GroupMapper } from './group-mapper';
 import { IGroup } from './interfaces/igroup';
 import { IResponseGroupDto } from './interfaces/iresponse-group-dto';
 import { IGroupDto } from './interfaces/igroup-dto';
-import { PgGroupRepository } from './repositories/pg-group-repository';
 import { IRepository } from '../shared/repositories/irepository';
 import { CustomException } from '../shared/errors/custom-exception';
 import { MethodException } from '../shared/errors/method-exception';
 import { logger } from '../logger/bootstrap-logger';
 
 export class GroupService {
-    private static instance: GroupService;
-
-    private constructor(
+    constructor(
         private mapper: GroupMapper,
         private repository: IRepository<IGroup>
     ) { }
-
-    static getInstance(mapper: GroupMapper, repository: IRepository<IGroup>): GroupService {
-        if (!GroupService.instance) {
-            GroupService.instance = new GroupService(mapper, repository);
-        }
-        return GroupService.instance;
-    }
 
     get(): Promise<IResponseGroupDto[]> {
         return this.repository
@@ -83,8 +73,3 @@ export class GroupService {
         }
     }
 }
-
-export const groupService = GroupService.getInstance(
-    new GroupMapper(),
-    new PgGroupRepository()
-);

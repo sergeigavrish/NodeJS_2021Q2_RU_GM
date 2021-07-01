@@ -4,10 +4,17 @@ import { IResponse } from '../shared/response/iresponse';
 import { failResponseFactory } from '../shared/response/responseFactory';
 import { validationResultGuard } from '../shared/validation/validation-error-guard';
 import { validationErrorMapper } from '../shared/validation/validation-error-mapper';
-import { groupController } from './group-controller';
+import { GroupController } from './group-controller';
+import { GroupMapper } from './group-mapper';
+import { GroupService } from './group-service';
 import { createGroupValidator, groupIdParamValidator, updateGroupValidator } from './group-validator';
+import { PgGroupRepository } from './repositories/pg-group-repository';
 
 export const groupRouter = express.Router();
+const groupMapper = new GroupMapper();
+const groupRepository = new PgGroupRepository();
+const groupService = new GroupService(groupMapper, groupRepository);
+const groupController = new GroupController(groupService);
 
 groupRouter
     .route('/')
