@@ -6,7 +6,7 @@ export function authMiddleware(req: Request, _: Response, next: NextFunction) {
     try {
         const authHeader = req.headers['authorization'];
         if (!authHeader) {
-            throw new AuthorizationException('Missing authHeader');
+            throw new AuthorizationException('Missing authorization header');
         }
         const token = authHeader.split(' ')[1]
         if (!token) {

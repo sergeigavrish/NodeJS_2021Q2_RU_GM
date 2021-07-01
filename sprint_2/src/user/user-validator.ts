@@ -8,13 +8,13 @@ const userValidator = createValidator({ passError: true });
 
 const createUserDto = object<IUserDto>({
     login: string().min(1).required(),
-    password: string().regex(/^(?:[0-9]+[a-z]|[a-z]+[0-9])[a-z0-9]*$/i).required(),
+    password: string().min(6).regex(/^(?:[0-9]+[a-z]|[a-z]+[0-9])[a-z0-9]*$/i).required(),
     age: number().min(4).max(130).required()
 });
 
 const updateUserDto = object<IUserDto>({
     login: string().min(1),
-    password: string().regex(/^(?:[0-9]+[a-z]|[a-z]+[0-9])[a-z0-9]*$/i),
+    password: string().min(6).regex(/^(?:[0-9]+[a-z]|[a-z]+[0-9])[a-z0-9]*$/i),
     age: number().min(4).max(130)
 });
 
