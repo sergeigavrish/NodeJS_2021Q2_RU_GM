@@ -1,6 +1,6 @@
 import express, { NextFunction, Request, Response } from 'express';
 import dotenv from 'dotenv';
-import { dbContext } from './db/db-context';
+import { initDb } from './db/db-context';
 import { groupRouter } from './group/group-router';
 import { bootstrapLogger, logger } from './logger/bootstrap-logger';
 import { CustomException } from './shared/errors/custom-exception';
@@ -33,7 +33,7 @@ const LABEL = 'APP';
 
   app.use(express.json());
 
-  await dbContext.sequelize.sync();
+  await initDb();
 
   app.use((req: Request, _: Response<IResponse>, next: NextFunction) => {
     logger.debug({ message: `${req.path} ${req.method} params %s query %s`, label: LABEL }, req.params, req.query);
